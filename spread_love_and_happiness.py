@@ -146,7 +146,7 @@ def queue_save_jobs(job_queue):
 
 def bot_queue_save(context):
     queue_save_jobs(
-        context.job_queue)
+        context.jobs)
 
 
 def main():
@@ -168,17 +168,7 @@ def main():
     updater = Updater(token=bot_token,
                       use_context=True)
 
-    # heroku webhook settings
-    proxy_port = int(os.environ.get(
-        "PORT", "8443"
-    ))
-    updater.start_webhook(listen="0.0.0.0",
-                          port=proxy_port,
-                          url_path=bot_token)
-    updater.bot.set_webhook(
-        "https://{0}.herokuapp.com/{1}".format(os.environ["APP_NAME"],
-                                               bot_token)
-    )
+
 
     dispatcher = updater.dispatcher
 
