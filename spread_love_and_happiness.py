@@ -146,10 +146,11 @@ def queue_save_jobs(job_queue):
 
 def bot_queue_save(context):
     queue_save_jobs(
-        context.jobs)
+        context)
 
 
 def main():
+
     bot_token = os.environ["BOT_TOKEN"]
 
     logger = logging.getLogger()
@@ -168,7 +169,17 @@ def main():
     updater = Updater(token=bot_token,
                       use_context=True)
 
-
+    # heroku webhook settings
+    proxy_port = int(os.environ.get(
+        "PORT", "8443"
+    ))
+    updater.start_webhook(listen="0.0.0.0",
+                          port=proxy_port,
+                          url_path=bot_token)
+    updater.bot.set_webhook(
+        "https://{0}.herokuapp.com/{1}".format(os.environ["APP_NAME"],
+                                               bot_token)
+    )
 
     dispatcher = updater.dispatcher
 
@@ -199,7 +210,8 @@ def main():
     updater.start_polling()
     updater.idle()
 
-    bot_queue_save(job_queue)
+    bot_queue_save(
+        job_queue)
 
 
 if __name__ == "__main__":
